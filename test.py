@@ -5,10 +5,10 @@ from open3d import *
 
 sys.path.append("../")
 
-'''
 import json
 from src.utils import to_json
 
+'''
 data = {('category1', 'category2'): {frozenset(['cat1', 'cat2']): np.int32(1212)}}
 print(json.dumps(to_json(data)))
 sys.exit(0)
@@ -63,7 +63,7 @@ if custom_data:
     start, end = 0, 1
     pad_to_this_number_of_points = 10000
 
-    fn = 'custom-ply/35.ply'
+    fn = 'custom-ply/3.ply'
     print("Load a ply point cloud, print it, and render it")
     pcd = o3d.io.read_point_cloud(fn)
     print(type(pcd), pcd)
@@ -308,7 +308,12 @@ for i in range(start, end):
     print(f'i: {i} - s_iou: {s_iou} - p_iou: {p_iou} - test_cds[-1]: {test_cds[-1]} - results: {results}')
     print(f'parameters: {parameters}')
     with open(f'pred-params-{i}.json', 'w') as fp:
-        json.dump(parameters, fp)
+        json_params = to_json(parameters)
+        print(f'json_params: {json_params}')
+        json.dump(json_params, fp)
+
+    import pickle
+    pickle.dump(parameters, open(f"pred-params-{i}.pkl", "wb"), protocol=0)
 
 print("Test CD: {}, Test p cover: {}, Test s cover: {}".format(np.mean(test_cds), np.mean(s_ks), np.mean(p_ks)))
 print("iou seg: {}, iou prim type: {}".format(np.mean(test_s_iou), np.mean(test_p_iou)))

@@ -399,19 +399,44 @@ def grad_norm(model):
     return np.isnan(total_norm) or np.isinf(total_norm)
 
 
-def key_to_json(data):
-    if data is None or isinstance(data, (bool, int, str)):
-        return data
+def tensor_to_numpy_array_to_list(data):
+    print(f'tensor_to_numpy_array_to_list() - data is: {data} - {type(data)}')
+    if isinstance(data, (torch.Tensor, torch.LongTensor)):
+        return data.cpu().detach().numpy().tolist()
+    return data
+
+def np_to_int_float(data):
+    print(f'np_to_int_float() - data is: {data} - {type(data)}')
     if isinstance(data, (np.float32, np.float64)):
         return float(data)
     if isinstance(data, (np.int32, np.int64)):
-        return float(data)
+        return int(data)
+    return data
+
+def key_to_json(data):
+    print(f'key_to_json() - data is: {data} - {type(data)}')
+    data = tensor_to_numpy_array_to_list(data)
+    data = np_to_int_float(data)
+    if data is None or isinstance(data, (bool, int, str)):
+        return data
     if isinstance(data, (tuple, frozenset)):
         return str(data)
     raise TypeError
 
 def to_json(data):
-    if data is None or isinstance(data, (bool, int, tuple, range, str, list)):
+    print(f'to_json() - data is: {data} - {type(data)}')
+    data = tensor_to_numpy_array_to_list(data)
+    data = np_to_int_float(data)
+    if data is None:
+        return '<None>'
+    if isinstance(data, (tuple, list)):
+        for j, d in enumerate(data):
+            print(f'to_json() loop - j = {j} - d = {d}')
+            d = tensor_to_numpy_array_to_list(d)
+            d = np_to_int_float(d)
+            data[j] = d
+        return data
+    if isinstance(data, (bool, int, range, str)):
         return data
     if isinstance(data, (set, frozenset)):
         return sorted(data)
