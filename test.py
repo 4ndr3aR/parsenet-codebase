@@ -5,12 +5,14 @@ from open3d import *
 
 sys.path.append("../")
 
+'''
 import json
 from src.utils import to_json
 
 data = {('category1', 'category2'): {frozenset(['cat1', 'cat2']): np.int32(1212)}}
 print(json.dumps(to_json(data)))
 sys.exit(0)
+'''
 
 import h5py
 
