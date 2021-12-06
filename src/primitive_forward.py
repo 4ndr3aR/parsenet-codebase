@@ -986,12 +986,14 @@ def fit_one_shape_torch(data, fitter, weights, bw, eval=False, sample_points=Fal
             if eval:
                 # since this is a eval mode, weights are all one.
                 Z = points.shape[0]
+                print(f'1. points.shape: {points.shape} - {points[0:3]}')
                 points = torch.from_numpy(remove_outliers(points.data.cpu().numpy()).astype(np.float32)).cuda(
                     points.get_device())
                 weight = weight[0:points.shape[0]]
 
                 # Note: we can apply poisson disk sampling to remove points.
                 # Rarely results in removal of points.
+                print(f'2. points.shape: {points.shape} - {points[0:3]}')
                 points, weight = up_sample_points_in_range(points, weight, 1400, 1800)
 
             recon_points = fitter.forward_pass_closed_spline(points, weights=weight, ids=label_index,

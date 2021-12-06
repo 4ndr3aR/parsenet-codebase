@@ -157,6 +157,7 @@ def up_sample_points_torch(points, times=1):
     for t in range(times):
         dist = torch.unsqueeze(points, 1) - torch.unsqueeze(points, 0)
         dist = torch.sum(dist ** 2, 2)
+        print(f'dist.shape: {dist.shape} - {dist[0:3]}')
         _, indices = torch.topk(dist, 5, 1, largest=False)
         neighbors = points[indices[:, 1:]]
         centers = torch.mean(neighbors, 1)
@@ -201,6 +202,7 @@ def dist_memory_efficient(p, q):
 
 def up_sample_points_in_range(points, weights, a_min, a_max):
     N = points.shape[0]
+    print(f'points.shape: {points.shape} - {points[0:3]}')
     if N > a_max:
         L = np.random.choice(np.arange(N), a_max, replace=False)
         points = points[L]
@@ -692,8 +694,8 @@ def bit_map_mesh(mesh, include_indices):
 
 
 def display_inlier_outlier(cloud, ind):
-    inlier_cloud = cloud.select_down_sample(ind)
-    outlier_cloud = cloud.select_down_sample(ind, invert=True)
+    inlier_cloud = cloud.select_by_index(ind)
+    outlier_cloud = cloud.select_by_index(ind, invert=True)
 
     print("Showing outliers (red) and inliers (gray): ")
     outlier_cloud.paint_uniform_color([1, 0, 0])
@@ -706,7 +708,21 @@ def remove_outliers(points, viz=False):
     cl, ind = pcd.remove_statistical_outlier(nb_neighbors=20,
                                              std_ratio=0.50)
     if viz:
+        '''
+        import open3d
+        import pkgutil
+        for i in pkgutil.iter_modules(open3d.__path__):
+            print(i)
+        import open3d.open3d_pybind
+        import open3d.open3d_pybind.geometry
+        '''
+        #for i in pkgutil.iter_modules(open3d.open3d_pybind.geometry.__path__):
+        #    print(i)
+        #from  open3d.open3d_pybind.geometry import voxel_down_sample,estimate_normals
+        voxel_down_pcd = pcd.voxel_down_sample(voxel_size=0.02)
         display_inlier_outlier(voxel_down_pcd, ind)
+        print(f'voxel_down_pcd.points.shape: {np.asarray(voxel_down_pcd.points).shape}')
+    print(f'cl.points.shape: {np.asarray(cl.points).shape}')
     return np.array(cl.points)
 
 
