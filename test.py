@@ -28,7 +28,6 @@ from src.primitives import SaveParameters
 from src.dataset_segments import Dataset
 from src.residual_utils import Evaluation
 import sys
-
 import open3d as o3d
 
 start = int(sys.argv[1])
